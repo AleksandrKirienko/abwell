@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vk-message-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vk-message-app
+  template:
+    metadata:
+      labels:
+        app: vk-message-app
+    spec:
+      containers:
+        - name: vk-message-app
+          image: your-docker-image:tag
+          ports:
+            - containerPort: 3000
+          env:
+            - name: RAILS_ENV
+              value: production
+            - name: REDIS_URL
+              value: redis://redis-service:6379/0

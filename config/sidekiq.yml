@@ -1,0 +1,4 @@
+:schedule:
+  handle_chat:
+    cron: '*/5 * * * *'  # Запуск каждые 5 минут
+    class: HandleChatWorker

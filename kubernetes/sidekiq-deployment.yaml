@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sidekiq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sidekiq
+  template:
+    metadata:
+      labels:
+        app: sidekiq
+    spec:
+      containers:
+        - name: sidekiq
+          image: your-docker-image:tag
+          command: ["bundle", "exec", "sidekiq"]
+          env:
+            - name: RAILS_ENV
+              value: production
+            - name: REDIS_URL
+              value: redis://redis-service:6379/0
