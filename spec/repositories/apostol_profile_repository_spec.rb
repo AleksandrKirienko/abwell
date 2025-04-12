@@ -3,7 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe ApostolProfileRepository do
-  let(:repository) { described_class.new }
+  let(:repository) { described_class.new(appropriate_bot_chat_id) }
+  let(:appropriate_bot_chat_id) { 3 }
+  let(:inappropriate_bot_chat_id) { 2 }
 
   describe '#get_appropriate' do
     context 'when no race is specified' do
@@ -11,8 +13,16 @@ RSpec.describe ApostolProfileRepository do
         time = Time.current.beginning_of_minute
         Timecop.freeze(time)
 
+        # Apo with oldest timeout but with another chat_id
+        create(:apostol_profile, :with_tasks,
+               bot_chat_id: inappropriate_bot_chat_id,
+               voice_count: 6,
+               tasks_count: 3,
+               last_buff_given_at: time - 300.seconds)
+
         # Первый апостол: 2 голоса больше, чем задач, старый таймаут
         create(:apostol_profile, :with_tasks,
+               bot_chat_id: appropriate_bot_chat_id,
                voice_count: 5,
                tasks_count: 3,
                last_buff_given_at: time - 200.seconds)

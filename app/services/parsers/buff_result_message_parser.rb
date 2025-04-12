@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BuffResultMessageParser
+class Parsers::BuffResultMessageParser
   REGULAR_FOR_ID = /id(\d+)/
   REGULAR_BUFF_TYPE = /благословение\s+(.*?)(\.|!|\s*Вы)/i
   REGULAR_APOSTOL_VOICE = /Голос у Апостола:\s*(\d+)/

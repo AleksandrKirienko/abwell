@@ -7,7 +7,6 @@ RSpec.describe TasksResolver do
 
   let(:api) { instance_double(Api::VkClient) }
   let(:chat_id) { 102 }
-  let(:full_chat_id) { 2000000000 + chat_id }
 
   before do
     allow(Api::VkClient).to receive(:new).and_return(api)
@@ -89,19 +88,12 @@ RSpec.describe TasksResolver do
       it 'sends buff messages only for oldest unresolved tasks of available apostols' do
         resolver.call
 
-        expect(api).to have_received(:send_message).with(
-          chat_id: full_chat_id,
-          random_id: 12345,
-          message: "Благословение человека"
-        ).ordered
-
-        expect(api).to have_received(:send_message).with(
-          chat_id: full_chat_id,
-          random_id: 12345,
-          message: "Благословение атаки"
-        ).ordered
-
-        expect(api).to have_received(:send_message).exactly(2).times
+        expect(api).to have_received(:send_message)
+                         .with("Благословение человека", chat_id, reply_to: task1.request_message_id.to_s)
+                         .exactly(1).time
+        expect(api).to have_received(:send_message)
+                         .with("Благословение атаки", chat_id, reply_to: task2.request_message_id.to_s)
+                         .exactly(1).time
       end
     end
 

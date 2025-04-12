@@ -3,9 +3,10 @@
 class ApostolProfileRepository
   APOSTOL_TIMEOUT = 90
 
-  attr_reader :race
+  attr_reader :race, :bot_chat_id
 
-  def initialize(race = nil)
+  def initialize(bot_chat_id, race = nil)
+    @bot_chat_id = bot_chat_id
     @race = race
   end
 
@@ -14,13 +15,11 @@ class ApostolProfileRepository
   end
 
   def get_appropriate_without_timeout
-    initial_scope = race ? filtered_by_race : ApostolProfile
-
     subquery =
       initial_scope
         .joins("LEFT JOIN buff_tasks tasks ON tasks.apostol_profile_id = apostol_profiles.id AND tasks.resolved = false")
         .where("apostol_profiles.last_buff_given_at <= ?", APOSTOL_TIMEOUT.seconds.ago)
-        .group("apostol_profiles.id, apostol_profiles.voice_count, apostol_profiles.last_buff_given_at")
+        .group("apostol_profiles.id, apostol_profiles.voice_count, apostol_profiles.last_buff_given_at, apostol_profiles.bot_chat_id")
         .select("apostol_profiles.*",
                 "(apostol_profiles.voice_count - COUNT(tasks.id)) as remaining_voices")
 
@@ -34,13 +33,12 @@ class ApostolProfileRepository
   end
 
   def get_appropriate_with_min_timeout
-    initial_scope = race ? filtered_by_race : ApostolProfile
-
     subquery = initial_scope
                  .joins("LEFT JOIN buff_tasks tasks ON tasks.apostol_profile_id = apostol_profiles.id AND tasks.resolved = false")
-                 .group("apostol_profiles.id, apostol_profiles.voice_count, apostol_profiles.last_buff_given_at")
+                 .group("apostol_profiles.id, apostol_profiles.voice_count, apostol_profiles.last_buff_given_at, apostol_profiles.bot_chat_id")
                  .select("apostol_profiles.*",
                          "(apostol_profiles.voice_count - COUNT(tasks.id)) as remaining_voices")
+
     scope =
       ApostolProfile
         .from("(#{subquery.to_sql}) AS apostol_profiles")
@@ -50,7 +48,7 @@ class ApostolProfileRepository
     scope.first
   end
 
-  def get_with_unresolved_tasks_without_timeout
+  def get_with_unresolved_tasks_without_timeout # need add bot_chat_id
     ApostolProfile
       .joins(:buff_tasks)
       .where(buff_tasks: { resolved: false })
@@ -61,7 +59,8 @@ class ApostolProfileRepository
 
   private
 
-  def filtered_by_race
-    ApostolProfile.where("races @> ARRAY[?]::integer[]", race)
+  def initial_scope
+    race_scope = race ? ApostolProfile.where("races @> ARRAY[?]::integer[]", race) : ApostolProfile
+    race_scope.where(bot_chat_id: bot_chat_id)
   end
 end

@@ -6,6 +6,8 @@ class BuffTask < ApplicationRecord
 
   validates :buff_type, presence: true
 
+  # TODO: Handle this error with chat notifier
+  #
   validates :game_account_id, uniqueness: {
     scope: [:buff_type, :resolved],
     conditions: -> { where(resolved: false) },
@@ -13,6 +15,6 @@ class BuffTask < ApplicationRecord
   }
 
   def resolve
-    update(resolved: true)
+    update!(resolved: true)
   end
 end

@@ -9,6 +9,10 @@ class TsRepository
     redis.get("ts")
   end
 
+  def del_ts
+    redis.del("ts")
+  end
+
   def redis
     @redis ||= Redis.new(host: "redis", port: 6379)
   end

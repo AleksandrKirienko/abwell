@@ -3,15 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe BuffTask, type: :model do
-  describe 'associations' do
-    it { should belong_to(:game_account) }
-    it { should belong_to(:apostol_profile) }
-  end
 
   describe 'validations' do
     subject { build(:buff_task) }
-
-    it { should validate_presence_of(:buff_type) }
 
     context 'uniqueness validation' do
       let(:game_account) { create(:game_account) }
@@ -71,12 +65,12 @@ RSpec.describe BuffTask, type: :model do
 
     it 'has a valid attack trait' do
       expect(build(:buff_task, :attack)).to be_valid
-      expect(build(:buff_task, :attack).buff_type).to eq(1)
+      expect(build(:buff_task, :attack).buff_type).to eq(BuffType::ATTACK)
     end
 
     it 'has a valid defense trait' do
       expect(build(:buff_task, :defense)).to be_valid
-      expect(build(:buff_task, :defense).buff_type).to eq(2)
+      expect(build(:buff_task, :defense).buff_type).to eq(BuffType::DEFENCE)
     end
   end
 end

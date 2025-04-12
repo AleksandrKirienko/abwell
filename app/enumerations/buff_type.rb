@@ -70,4 +70,8 @@ class BuffType < EnumerateIt::Base
   def self.string_to_types(string)
     STRING_TO_BUFF[string]
   end
+
+  def self.invalid_races(valid_races)
+    race_buffs - valid_races
+  end
 end

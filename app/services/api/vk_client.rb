@@ -1,10 +1,22 @@
 class Api::VkClient
-  MESSAGE_SEARCH_PERIOD = 1.day
-  MESSAGE_SEARCH_RANGE = 10
-  MESSAGE_SEARCH_CHAT = -183040898
+  attr_reader :api_token
 
-  def get_long_pool_data(ts)
-    long_pool_request(ts).body
+  BOT_TEST_CHAT_ID = 2
+  DEFAULT_HISTORY_SIZE = 50
+
+  def initialize(api_token = bot_api_token)
+    @api_token = api_token
+  end
+
+  def get_long_pool_data(ts: nil)
+    long_pool_request(ts)&.body
+  end
+
+  def get_chat_history(chat_id = BOT_TEST_CHAT_ID, count: DEFAULT_HISTORY_SIZE)
+    api.messages_getHistory(
+      peer_id: normalize_chat_id(chat_id, full: true),
+      count: count
+    )
   end
 
   def long_pool_request(ts)
@@ -18,25 +30,24 @@ class Api::VkClient
     puts "[ERROR] #{e}"
   end
 
-  def search_messages(message_query)
+  def search_messages(message_query, peer_id, period, count)
     api.messages_search(
       q: message_query,
-      peer_id: MESSAGE_SEARCH_CHAT,
-      timestamp_from: MESSAGE_SEARCH_PERIOD.ago.to_i,
+      peer_id: peer_id,
+      timestamp_from: period.ago.to_i,
       timestamp_to: Time.current.to_i,
-      count: MESSAGE_SEARCH_RANGE,
+      count: count,
     )
   end
 
-  def send_message(message)
-    api.messages_send(
-      chat_id: MESSAGE_SEARCH_CHAT,
-      random_id: rand(10000..99999),
-      message: message,
-      )
-  end
+  def send_message(message, chat_id, reply_to: nil)
+    params = { chat_id: normalize_chat_id(chat_id),
+               random_id: rand(10000..99999),
+               message: message }
+    params.merge!(reply_to: reply_to) if reply_to
 
-  private
+    api.messages_send(**params)
+  end
 
   def long_pool_uri(ts = nil)
     key = long_pool_server['key']
@@ -52,8 +63,21 @@ class Api::VkClient
     @long_pool_server ||= api.messages_getLongPollServer
   end
 
-
   def api
-    Vkontakte::API.new(MY_TOKEN)
+    Vkontakte::API.new(api_token).tap do |api|
+      raise VkApiInitializeError unless api
+    end
   end
+
+  def bot_api_token
+    ENV["BOT_ACCESS_TOKEN"]
+  end
+
+  def normalize_chat_id(chat_id, full: false)
+    normalized_chat_id = chat_id.to_i.then { |id| id > 2000000000 ? id - 2000000000 : id }
+
+    full ? normalized_chat_id + 2000000000 : normalized_chat_id
+  end
+
+  class VkApiInitializeError < StandardError; end
 end

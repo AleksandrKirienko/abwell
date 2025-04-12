@@ -4,8 +4,10 @@ FactoryBot.define do
     voice_count { 3 }
     buffs_given { 0 }
     chat_id { 111 }
+    bot_chat_id { 222 }
     races { [1, 2] }
-    last_buff_given_at { nil }
+    last_buff_given_at { 2.minutes.ago }
+    access_token { SecureRandom.uuid }
 
     trait :with_tasks do
       transient do

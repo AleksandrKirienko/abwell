@@ -1,25 +1,27 @@
 # frozen_string_literal: true
 
-class HandleChatWorker
-  include Sidekiq::Worker
+require 'sidekiq-scheduler'
+
+class HandlingChatWorker
+  include Sidekiq::Job
 
   def perform
+    logger.info "HandlingChatWorker started at #{Time.now}"
     call
   rescue StandardError => e
-    # Добавьте логирование ошибок
-    logger.error "HandleChatWorker error: #{e.message}"
+    logger.error "HandlingChatWorker error: #{e.message}"
     logger.error e.backtrace.join("\n")
-    raise # Перебросить ошибку, чтобы Sidekiq мог её отследить
+    raise
   end
 
   def call
-    long_pool_data = api_client.get_long_pool_data(get_ts)
+    long_pool_data = api_client.get_long_pool_data(ts: get_ts)
     parsed_data = parse(long_pool_data)
 
     set_ts(parsed_data["ts"])
 
-    parsed_data["updates"].each do |event|
-      EventHandler.new(event).call
+    parsed_data["updates"]&.each do |event|
+      EventHandler::All.new(event).call
     end
   end
 
@@ -45,4 +47,3 @@ class HandleChatWorker
     @api_client ||= Api::VkClient.new
   end
 end
-

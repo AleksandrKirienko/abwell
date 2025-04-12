@@ -7,8 +7,12 @@ class CreateApostolProfiles < ActiveRecord::Migration[6.1]
       t.integer :voice_count, null: false, default: 0
       t.integer :buffs_given, null: false, default: 0
       t.integer :chat_id, null: false
+      t.integer :bot_chat_id, null: false
       t.integer :races, array: true
       t.timestamp :last_buff_given_at
+
+      t.text :access_token
+      t.boolean :token_active, default: true
 
       t.timestamps
     end

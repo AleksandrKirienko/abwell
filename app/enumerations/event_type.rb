@@ -7,7 +7,7 @@ class EventType < EnumerateIt::Base
     message_new: 4,
   )
 
-  def self.is_message_new?(type)
+  def self.is_chat_message?(type)
     type == self::MESSAGE_NEW
   end
 end

@@ -1,4 +1,9 @@
-:schedule:
-  handle_chat:
-    cron: '*/5 * * * *'  # Запуск каждые 5 минут
-    class: HandleChatWorker
+handling_chat_worker:
+  cron: "*/11 * * * * *"
+  class: HandlingChatWorker
+  description: "Fetch buff requests from guild chats"
+
+resolving_tasks_worker:
+  cron: "*/20 * * * * *"
+  class: ResolvingTasksWorker
+  description: "Regular check tasks on apostols and handle it"

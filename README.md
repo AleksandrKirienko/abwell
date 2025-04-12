@@ -20,5 +20,11 @@ Things you may want to cover:
 * Services (job queues, cache servers, search engines, etc.)
 
 * Deployment instructions
+  * Install ENV variables
+    * BOT_ACCESS_TOKEN
+    * RAILS_MASTER_KEY
+    * ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+    * ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+    * ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
 
-* ...
+* Dont forget manualy add ApostolProfile and GameAccount for each chat under apostol activity

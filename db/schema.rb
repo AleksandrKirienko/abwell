@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_11_02_204400) do
-
+ActiveRecord::Schema[7.1].define(version: 2024_11_02_204400) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -20,10 +19,13 @@ ActiveRecord::Schema.define(version: 2024_11_02_204400) do
     t.integer "voice_count", default: 0, null: false
     t.integer "buffs_given", default: 0, null: false
     t.integer "chat_id", null: false
+    t.integer "bot_chat_id", null: false
     t.integer "races", array: true
-    t.datetime "last_buff_given_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "last_buff_given_at", precision: nil
+    t.text "access_token"
+    t.boolean "token_active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["game_account_id"], name: "index_apostol_profiles_on_game_account_id"
   end
 
@@ -33,8 +35,8 @@ ActiveRecord::Schema.define(version: 2024_11_02_204400) do
     t.integer "buff_type", default: 0, null: false
     t.integer "request_message_id", null: false
     t.boolean "resolved", default: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["apostol_profile_id"], name: "index_buff_tasks_on_apostol_profile_id"
     t.index ["game_account_id"], name: "index_buff_tasks_on_game_account_id"
   end
@@ -42,8 +44,8 @@ ActiveRecord::Schema.define(version: 2024_11_02_204400) do
   create_table "game_accounts", force: :cascade do |t|
     t.integer "vk_id", null: false
     t.integer "buffs_received", default: 0, null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_foreign_key "apostol_profiles", "game_accounts"
